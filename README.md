@@ -1,89 +1,165 @@
-# Create Enterprise Backend
+# 🚀 Create Enterprise Backend
 
-A CLI tool for scaffolding enterprise-ready backend applications with Express or Fastify, integrated with MongoDB or Supabase.
+Create Enterprise Backend is a modern CLI tool to scaffold production-ready backend applications using Express or Fastify with MongoDB or Supabase, following enterprise best practices.
 
-## Features
+⚡ Zero setup. Secure defaults. Scalable structure.
 
-- **Frameworks**: Choose between Express.js or Fastify
-- **Databases**: Support for MongoDB or Supabase
-- **Authentication**: Pre-configured JWT authentication modules
-- **Middleware**: Built-in error handling, database guards, and JWT guards
-- **Project Structure**: Organized modular architecture for scalability
+## ✨ Features
 
-## Installation
+### 🏗 Frameworks
+- Express
+- Fastify
 
-Install globally using npm:
+### 🗄 Databases
+- MongoDB (Mongoose)
+- Supabase (Postgres + Auth)
 
+### 🔐 Authentication Ready
+- JWT-based auth
+- Auth guards & middleware
+- Safe handling when DB/env is missing
+
+### 🧱 Enterprise Architecture
+- Modular structure
+- Controllers / Services / Routes
+- Centralized error handling
+- Environment-based config
+
+### 🛠 Developer Experience
+- Nodemon preconfigured
+- Clean logging
+- Safe defaults (no crash if DB not configured)
+
+## 📦 Installation & Usage
+
+You don't need to install anything globally.
+
+**Create a new backend project**
 ```bash
-npm install -g create-enterprise-backend
+npx create-enterprise-backend my-backend
 ```
 
-Or use with npx without installing:
-
+**or inside the current folder:**
 ```bash
-npx create-enterprise-backend
+npx create-enterprise-backend .
 ```
 
-## Usage
+## 🧭 Interactive Setup
 
-Run the CLI and follow the interactive prompts:
+The CLI will guide you through:
+- Framework selection (Express / Fastify)
+- Database selection (MongoDB / Supabase)
+- Dependency installation (Install now or later)
 
-```bash
-create-enterprise-backend [project-name]
+## 📁 Project Structure (Example)
+```
+src/
+├── app.js
+├── server.js
+├── routes.js
+├── config/
+│   ├── env.js
+│   ├── db.js          # Mongo
+│   └── supabase.js    # Supabase
+├── modules/
+│   └── auth/
+│       ├── auth.controller.js
+│       ├── auth.routes.js
+│       ├── auth.service.js
+│       ├── auth.schema.js
+│       └── user.model.js
+├── middlewares/
+├── services/
+└── utils/
+    ├── error-handler.js
+    ├── jwt-guard.js
+    └── db-guard.js
 ```
 
-### Options
-
-- **Project Name**: Optional. If not provided, you'll be prompted to enter it.
-- **Framework**: Select Express or Fastify
-- **Database**: Choose MongoDB or Supabase
-- **Install Dependencies**: Option to install npm packages immediately
-
-### Example
-
+## ▶️ Running the Server
 ```bash
-npx create-enterprise-backend my-backend-app
+npm run dev
 ```
 
-This will create a new directory `my-backend-app` with the scaffolded backend.
+**Output example:**
+```
+⚠️ Supabase public client disabled (missing env vars)
+⚠️ Supabase admin client disabled (missing env vars)
+🚀 Server running at http://localhost:5000
+```
 
-## Project Structure
+This is intentional and safe — the app won't crash if env vars are missing.
 
-The generated project includes:
+## 🔑 Environment Variables
 
-- **src/app.js**: Main application setup
-- **src/server.js**: Server initialization
-- **src/routes.js**: Route definitions
-- **src/config/**: Configuration files (database, environment)
-- **src/middlewares/**: Custom middleware (guards, error handling)
-- **src/modules/**: Modular components (e.g., auth module)
-- **src/services/**: Business logic services
-- **src/utils/**: Utility functions
+### MongoDB
+```
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/myapp
+JWT_SECRET=supersecret
+```
 
-## Getting Started
+### Supabase
+```
+PORT=5000
+SUPABASE_URL=https://xxxx.supabase.co
+SUPABASE_ANON_KEY=public-key
+SUPABASE_SERVICE_ROLE_KEY=service-role-key
+JWT_SECRET=supersecret
+```
 
-After generating the project:
+## 🛡 Database Safety (Enterprise Behavior)
 
-1. Navigate to the project directory:
-   ```bash
-   cd my-backend-app
-   ```
+- If DB is not connected, DB-dependent routes are automatically blocked
+- The server never crashes due to missing DB or env variables
+- Clear warnings are logged instead
 
-2. Start the development server:
-   ```bash
-   npm run dev
-   ```
+## 🧪 Health Check
+```
+GET /health
+```
 
-3. The server will run on the configured port (check `src/config/env.js`).
+**Response:**
+```json
+{
+  "status": "ok"
+}
+```
 
-## Requirements
+## 📌 Node Version
+- Node.js ≥ 18
 
-- Node.js >= 18
+## 🧠 Philosophy
 
-## Contributing
+This tool is built for:
+- SaaS backends
+- Admin dashboards
+- APIs at scale
+- Teams that care about structure & safety
 
-Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/ImaadDev/create-enterprise-backend).
+It's meant to be extended, not locked.
 
-## License
+## 🛣 Roadmap
+- PostgreSQL & MySQL templates
+- Docker & CI templates
+- CLI flags (--yes, --framework, --db)
+- Prisma / Drizzle support
+- RBAC & multi-tenant auth
 
-MIT# create-enterprise-backend
+## 🤝 Contributing
+
+Contributions are welcome!
+- Fork the repo
+- Create a feature branch
+- Submit a PR
+
+## 📄 License
+
+MIT © Imad Hussain Khan
+
+## ⭐ Support
+
+If this tool helped you:
+- ⭐ Star the repo
+- 🐛 Report issues
+- 💡 Suggest features
