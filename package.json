@@ -1,12 +1,17 @@
 {
   "name": "create-enterprise-backend",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Enterprise backend scaffolder (Express/Fastify + Mongo/Supabase)",
   "type": "module",
   "bin": {
     "create-enterprise-backend": "./bin/cli.js"
   },
-  "files": ["bin", "core", "templates", "README.md"],
+  "files": [
+    "bin",
+    "core",
+    "templates",
+    "README.md"
+  ],
   "keywords": [
     "cli",
     "scaffold",
@@ -26,12 +31,11 @@
     "prompts": "^2.4.2"
   },
   "repository": {
-  "type": "git",
-  "url": "https://github.com/ImaadDev/create-enterprise-backend"
-},
-"bugs": {
-  "url": "https://github.com/ImaadDev/create-enterprise-backend/issues"
-},
-"homepage": "https://github.com/ImaadDev/create-enterprise-backend#readme"
-
+    "type": "git",
+    "url": "https://github.com/ImaadDev/create-enterprise-backend"
+  },
+  "bugs": {
+    "url": "https://github.com/ImaadDev/create-enterprise-backend/issues"
+  },
+  "homepage": "https://github.com/ImaadDev/create-enterprise-backend#readme"
 }
