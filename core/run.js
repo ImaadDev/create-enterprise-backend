@@ -1,4 +1,5 @@
 import path from "path";
+import fs from "fs-extra";
 import prompts from "prompts";
 import chalk from "chalk";
 import { generateProject } from "./scaffold.js";
@@ -15,8 +16,7 @@ export async function run() {
         type: projectNameArg ? null : "text",
         name: "projectName",
         message: "Project name?",
-        validate: (v) =>
-          v?.trim()?.length ? true : "Project name is required"
+        validate: v => v?.trim()?.length ? true : "Project name is required"
       },
       {
         type: "select",
@@ -54,7 +54,6 @@ export async function run() {
   );
 
   const projectName = (projectNameArg || answers.projectName).trim();
-  const { framework, database } = answers;
 
   const targetDir =
     projectName === "." || projectName === "./"
@@ -64,11 +63,17 @@ export async function run() {
   console.log(chalk.gray("\n📦 Generating project..."));
 
   await generateProject({
-    framework,
-    database,
+    framework: answers.framework,
+    database: answers.database,
     targetDir,
     projectName
   });
+
+  // 🔒 SAFETY CHECK
+  const pkgPath = path.join(targetDir, "package.json");
+  if (!(await fs.pathExists(pkgPath))) {
+    throw new Error("package.json not found. Scaffolding failed.");
+  }
 
   if (answers.install) {
     console.log(chalk.gray("\n📥 Installing dependencies..."));

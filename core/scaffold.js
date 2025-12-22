@@ -19,8 +19,8 @@ export async function generateProject({
   projectName
 }) {
   const root = getPackageRoot();
-
   const dbFolder = DB_MAP[database];
+
   if (!dbFolder) {
     throw new Error(`Unsupported database: ${database}`);
   }
@@ -31,19 +31,29 @@ export async function generateProject({
     throw new Error(`Template not found: ${framework}/${dbFolder}`);
   }
 
-  const isCurrentDir =
-    projectName === "." || projectName === "./";
-
-  if (!isCurrentDir && (await fs.pathExists(targetDir))) {
-    throw new Error(`Target folder already exists: ${projectName}`);
-  }
+  const isCurrentDir = projectName === "." || projectName === "./";
 
   await fs.ensureDir(targetDir);
 
-  await fs.copy(templateDir, targetDir, {
-    overwrite: false,
-    errorOnExist: true
-  });
+  // 🔒 EMPTY DIRECTORY CHECK (CRITICAL)
+  if (isCurrentDir) {
+    const entries = await fs.readdir(targetDir);
+    const allowed = [".git", ".gitignore", ".DS_Store"];
+
+    const unsafe = entries.filter(e => !allowed.includes(e));
+    if (unsafe.length > 0) {
+      throw new Error(
+        "Current directory is not empty. Please use an empty folder."
+      );
+    }
+  } else {
+    if ((await fs.pathExists(targetDir)) && (await fs.readdir(targetDir)).length) {
+      throw new Error(`Target folder already exists: ${projectName}`);
+    }
+  }
+
+  // ✅ SAFE COPY
+  await fs.copy(templateDir, targetDir);
 
   // Rename package.json only when not using "."
   const pkgPath = path.join(targetDir, "package.json");
