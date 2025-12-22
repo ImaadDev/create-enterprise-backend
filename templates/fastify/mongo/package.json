@@ -1,0 +1,23 @@
+{
+  "name": "backend-app",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "@fastify/jwt": "^7.0.1",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "fastify": "^4.27.0",
+    "fastify-plugin": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
+
+
