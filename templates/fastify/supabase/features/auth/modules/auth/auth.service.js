@@ -3,7 +3,6 @@ import { supabasePublic } from "../../config/supabase.js";
 
 /**
  * Login user (ACCESS TOKEN ONLY)
- * Refresh-token feature may extend this later
  */
 export async function loginUser({ email, password }) {
   const { data, error } = await supabasePublic.auth.signInWithPassword({
@@ -11,19 +10,13 @@ export async function loginUser({ email, password }) {
     password
   });
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   const user = data.user;
   const role = user.user_metadata?.role || "user";
 
   const accessToken = jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-      role
-    },
+    { id: user.id, email: user.email, role },
     process.env.JWT_SECRET,
     { expiresIn: "15m" }
   );
@@ -37,6 +30,7 @@ export async function loginUser({ email, password }) {
     }
   };
 }
+
 
 /**
  * Get current authenticated user

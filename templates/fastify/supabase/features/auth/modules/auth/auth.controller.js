@@ -1,26 +1,30 @@
 import { loginUser, getMe } from "./auth.service.js";
 
-/**
- * POST /api/auth/login
- */
+// OPTIONAL refresh extension
+let attachRefresh = null;
+try {
+  ({ attachRefresh } = await import("./refresh.attach.js"));
+} catch {
+  // refresh-token feature not installed → ignore
+}
+
 export async function loginController(request, reply) {
   const { email, password } = request.body;
 
-  if (!email || !password) {
-    return reply.code(400).send({
-      message: "Email and password are required"
-    });
-  }
-
   try {
-    const result = await loginUser({ email, password });
+    let result = await loginUser({ email, password });
+
+    // 🔑 attach refresh token only if feature exists
+    if (attachRefresh) {
+      result = attachRefresh(result, request);
+    }
+
     reply.send(result);
   } catch (err) {
-    reply.code(401).send({
-      message: err.message || "Invalid credentials"
-    });
+    reply.code(401).send({ message: err.message });
   }
 }
+
 
 /**
  * GET /api/auth/me

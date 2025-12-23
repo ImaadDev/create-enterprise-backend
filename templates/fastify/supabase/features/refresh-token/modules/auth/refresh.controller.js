@@ -31,11 +31,32 @@ export async function refreshController(request, reply) {
   }
 }
 
+
 export async function logoutController(request, reply) {
-  const { refreshToken } = request.body || {};
-  if (refreshToken) {
-    request.server.refreshStore.remove(refreshToken);
+  const { refreshToken } = request.body;
+
+  if (!refreshToken) {
+    return reply.code(400).send({ message: "Refresh token required" });
   }
 
-  reply.send({ message: "Logged out" });
+  request.server.refreshStore.remove(refreshToken);
+
+  return { message: "Logged out successfully" };
 }
+
+export async function logoutAllController(request, reply) {
+  // 🔐 auth middleware must run
+  if (!request.auth) {
+    return reply.code(401).send({ message: "Unauthorized" });
+  }
+
+  // ✅ CORRECT SOURCE
+  const userId = request.auth.id;
+
+  request.server.refreshStore.removeAll(userId);
+
+  return { message: "Logged out from all devices" };
+}
+
+
+
