@@ -1,165 +1,205 @@
 # 🚀 Create Enterprise Backend
 
-Create Enterprise Backend is a modern CLI tool to scaffold production-ready backend applications using Express or Fastify with MongoDB or Supabase, following enterprise best practices.
-
-⚡ Zero setup. Secure defaults. Scalable structure.
+A powerful enterprise-grade backend scaffolding CLI that generates a production-ready Fastify or Express backend with Supabase authentication, JWT, Refresh Tokens, RBAC, and secure session management — in seconds.
 
 ## ✨ Features
 
-### 🏗 Frameworks
-- Express
-- Fastify
-
-### 🗄 Databases
-- MongoDB (Mongoose)
-- Supabase (Postgres + Auth)
-
-### 🔐 Authentication Ready
-- JWT-based auth
-- Auth guards & middleware
-- Safe handling when DB/env is missing
-
-### 🧱 Enterprise Architecture
-- Modular structure
-- Controllers / Services / Routes
-- Centralized error handling
-- Environment-based config
-
-### 🛠 Developer Experience
-- Nodemon preconfigured
-- Clean logging
-- Safe defaults (no crash if DB not configured)
+- ⚡ Fastify / Express support
+- 🔐 Supabase Auth integration
+- 🔑 JWT-based backend authentication
+- ♻️ Refresh Tokens with rotation
+- 🚪 Logout & Logout-All (multi-device)
+- 🛡️ Role-Based Access Control (RBAC)
+- 🧩 Feature-based architecture
+- 📦 Auto-generated route registration
+- 🔧 Enterprise-ready folder structure
+- 💡 Extensible for future features
 
 ## 📦 Installation & Usage
 
-You don't need to install anything globally.
+Run directly with NPX
 
-**Create a new backend project**
 ```bash
 npx create-enterprise-backend my-backend
 ```
 
-**or inside the current folder:**
+Or generate inside the current directory:
+
 ```bash
 npx create-enterprise-backend .
 ```
 
-## 🧭 Interactive Setup
+## 🧭 CLI Flow
 
-The CLI will guide you through:
-- Framework selection (Express / Fastify)
-- Database selection (MongoDB / Supabase)
-- Dependency installation (Install now or later)
+You'll be prompted to select:
 
-## 📁 Project Structure (Example)
+- **Backend framework**
+  - Fastify
+  - Express
+
+- **Database**
+  - MongoDB
+  - Supabase
+
+- **Enterprise features**
+  - Authentication (JWT + Supabase)
+  - Refresh Tokens + Logout
+  - Role-Based Access Control (RBAC)
+
+## 🗂️ Generated Project Structure
+
 ```
 src/
-├── app.js
-├── server.js
-├── routes.js
 ├── config/
-│   ├── env.js
-│   ├── db.js          # Mongo
-│   └── supabase.js    # Supabase
+│   └── supabase.js
+├── plugins/
+│   ├── auth.js
+│   ├── refresh.store.js
+│   └── request-context.js
 ├── modules/
 │   └── auth/
 │       ├── auth.controller.js
-│       ├── auth.routes.js
 │       ├── auth.service.js
-│       ├── auth.schema.js
-│       └── user.model.js
-├── middlewares/
-├── services/
-└── utils/
-    ├── error-handler.js
-    ├── jwt-guard.js
-    └── db-guard.js
+│       ├── auth.routes.js
+│       ├── refresh.controller.js
+│       ├── refresh.routes.js
+│       └── refresh.service.js
+├── generated/
+│   └── register.js
+├── routes.js
+├── app.js
+└── server.js
 ```
 
-## ▶️ Running the Server
-```bash
-npm run dev
+⚠️ The features folder exists only in templates and is never copied into the generated project.
+
+## 🔐 Authentication Flow
+
+### Login
+
+```
+POST /api/auth/login
 ```
 
-**Output example:**
-```
-⚠️ Supabase public client disabled (missing env vars)
-⚠️ Supabase admin client disabled (missing env vars)
-🚀 Server running at http://localhost:5000
-```
+Returns:
 
-This is intentional and safe — the app won't crash if env vars are missing.
-
-## 🔑 Environment Variables
-
-### MongoDB
-```
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/myapp
-JWT_SECRET=supersecret
-```
-
-### Supabase
-```
-PORT=5000
-SUPABASE_URL=https://xxxx.supabase.co
-SUPABASE_ANON_KEY=public-key
-SUPABASE_SERVICE_ROLE_KEY=service-role-key
-JWT_SECRET=supersecret
-```
-
-## 🛡 Database Safety (Enterprise Behavior)
-
-- If DB is not connected, DB-dependent routes are automatically blocked
-- The server never crashes due to missing DB or env variables
-- Clear warnings are logged instead
-
-## 🧪 Health Check
-```
-GET /health
-```
-
-**Response:**
 ```json
 {
-  "status": "ok"
+  "accessToken": "...",
+  "refreshToken": "...",
+  "user": {
+    "id": "...",
+    "email": "...",
+    "role": "user"
+  }
 }
 ```
 
-## 📌 Node Version
-- Node.js ≥ 18
+### Protected Route
 
-## 🧠 Philosophy
+```
+GET /api/auth/me
+Authorization: Bearer ACCESS_TOKEN
+```
 
-This tool is built for:
-- SaaS backends
-- Admin dashboards
-- APIs at scale
-- Teams that care about structure & safety
+### Refresh Token
 
-It's meant to be extended, not locked.
+```
+POST /api/auth/refresh
+{
+  "refreshToken": "..."
+}
+```
 
-## 🛣 Roadmap
-- PostgreSQL & MySQL templates
-- Docker & CI templates
-- CLI flags (--yes, --framework, --db)
-- Prisma / Drizzle support
-- RBAC & multi-tenant auth
+Returns new access + refresh tokens (rotation enabled).
 
-## 🤝 Contributing
+### Logout (current device)
 
-Contributions are welcome!
-- Fork the repo
-- Create a feature branch
-- Submit a PR
+```
+POST /api/auth/logout
+{
+  "refreshToken": "..."
+}
+```
 
-## 📄 License
+### Logout from all devices
 
-MIT © Imad Hussain Khan
+```
+POST /api/auth/logout-all
+Authorization: Bearer ACCESS_TOKEN
+```
+
+Revokes all active sessions for the user.
+
+## 🛡️ Security Design
+
+- Access tokens are short-lived
+- Refresh tokens are rotated
+- Logout-all revokes all sessions
+- RBAC enforced at backend level
+- Supabase used only as Identity Provider
+- Backend controls authorization
+
+## ⚙️ Environment Variables
+
+Create a `.env` file:
+
+```env
+PORT=5000
+JWT_SECRET=your_super_strong_secret
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+## 🚧 Development
+
+```bash
+npm install
+npm run dev
+```
+
+## 🧠 Why Not Use Supabase JWT Directly?
+
+Supabase Auth verifies identity.
+This backend issues its own JWT to:
+
+- enforce RBAC
+- support logout-all
+- control refresh rotation
+- decouple backend from Supabase
+- scale to microservices
+
+This is industry-standard architecture.
+
+## 🔮 Roadmap
+
+- ✅ Express + Supabase support
+- ⏳ MongoDB auth & RBAC
+- ⏳ Refresh token persistence (Supabase DB)
+- ⏳ Session & device tracking
+- ⏳ Rate limiting & brute-force protection
+- ⏳ Admin session management
+- ⏳ OAuth providers
+
+## 👨‍💻 Author
+
+Imad Hussain Khan  
+Full-Stack Web Developer  
+Enterprise Backend & SaaS Architect
 
 ## ⭐ Support
 
-If this tool helped you:
+If you find this useful:
+
 - ⭐ Star the repo
-- 🐛 Report issues
-- 💡 Suggest features
+- 📦 Use it in your projects
+- 💬 Share feedback & ideas
+
+## 🏁 Final Note
+
+This tool is designed for real-world, enterprise backends, not demos.
+
+If you understand this codebase — you understand modern backend architecture.
+
+🚀 Happy building!
