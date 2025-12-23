@@ -1,23 +1,25 @@
 # 🚀 Create Enterprise Backend
 
-A powerful enterprise-grade backend scaffolding CLI that generates a production-ready Fastify or Express backend with Supabase authentication, JWT, Refresh Tokens, RBAC, and secure session management — in seconds.
+> **⚠️ BETA VERSION**: This package is currently in beta (v0.1.2) with limited features. Full enterprise features are only available for Fastify + Supabase templates. Express support is basic, and some advanced features are still in development.
+
+A powerful enterprise-grade backend scaffolding CLI that generates production-ready backends with authentication, JWT, and database integration — in seconds.
 
 ## ✨ Features
 
-- ⚡ Fastify / Express support
-- 🔐 Supabase Auth integration
-- 🔑 JWT-based backend authentication
-- ♻️ Refresh Tokens with rotation
-- 🚪 Logout & Logout-All (multi-device)
-- 🛡️ Role-Based Access Control (RBAC)
-- 🧩 Feature-based architecture
-- 📦 Auto-generated route registration
-- 🔧 Enterprise-ready folder structure
-- 💡 Extensible for future features
+- ⚡ **Frameworks**: Fastify and Express support
+- 🗄️ **Databases**: MongoDB and Supabase integration
+- 🔐 **Authentication**: JWT-based auth (basic for Express/MongoDB, advanced for Fastify/Supabase)
+- ♻️ **Refresh Tokens**: Available for Fastify + Supabase (with rotation)
+- 🚪 **Logout**: Single device and all devices (Fastify + Supabase only)
+- 🛡️ **Role-Based Access Control (RBAC)**: Available for Fastify + Supabase
+- 🧩 **Modular Architecture**: Feature-based structure for scalability
+- 📦 **Auto-generated Routes**: Automatic route registration
+- 🔧 **Enterprise-ready Structure**: Organized folder layout
+- 💡 **Extensible**: Designed for future enhancements
 
 ## 📦 Installation & Usage
 
-Run directly with NPX
+Install globally or run directly with NPX:
 
 ```bash
 npx create-enterprise-backend my-backend
@@ -33,49 +35,83 @@ npx create-enterprise-backend .
 
 You'll be prompted to select:
 
-- **Backend framework**
-  - Fastify
-  - Express
+- **Backend Framework**
+  - Fastify (recommended for full features)
+  - Express (basic features)
 
 - **Database**
-  - MongoDB
-  - Supabase
+  - MongoDB (basic auth)
+  - Supabase (advanced auth features)
 
-- **Enterprise features**
-  - Authentication (JWT + Supabase)
-  - Refresh Tokens + Logout
-  - Role-Based Access Control (RBAC)
+- **Features** (available based on selections)
+  - Basic Authentication (JWT)
+  - Advanced Auth (Refresh Tokens, RBAC) - Fastify + Supabase only
 
 ## 🗂️ Generated Project Structure
+
+The structure varies by template. For Fastify + Supabase (full features):
 
 ```
 src/
 ├── config/
+│   ├── env.js
 │   └── supabase.js
 ├── plugins/
 │   ├── auth.js
 │   ├── refresh.store.js
 │   └── request-context.js
 ├── modules/
-│   └── auth/
-│       ├── auth.controller.js
-│       ├── auth.service.js
-│       ├── auth.routes.js
-│       ├── refresh.controller.js
-│       ├── refresh.routes.js
-│       └── refresh.service.js
+│   ├── auth/
+│   │   ├── auth.controller.js
+│   │   ├── auth.service.js
+│   │   ├── auth.routes.js
+│   │   ├── refresh.controller.js
+│   │   ├── refresh.routes.js
+│   │   └── refresh.service.js
+│   ├── products/  # Example module
+│   └── users/     # Example module
 ├── generated/
 │   └── register.js
+├── utils/
+│   └── error-handler.js
 ├── routes.js
 ├── app.js
 └── server.js
 ```
 
-⚠️ The features folder exists only in templates and is never copied into the generated project.
+For Express + MongoDB (basic features):
+
+```
+src/
+├── config/
+│   ├── db.js
+│   └── env.js
+├── middlewares/
+│   ├── db-guard.js
+│   └── jwt.guard.js
+├── modules/
+│   └── auth/
+│       ├── auth.controller.js
+│       ├── auth.service.js
+│       ├── auth.routes.js
+│       └── user.model.js
+├── utils/
+│   └── error-handler.js
+├── routes.js
+├── app.js
+└── server.js
+```
 
 ## 🔐 Authentication Flow
 
-### Login
+### Basic Auth (Express/MongoDB & Fastify/MongoDB)
+
+- Simple JWT-based login and protected routes
+- User registration and login endpoints
+
+### Advanced Auth (Fastify + Supabase Only)
+
+#### Login
 
 ```
 POST /api/auth/login
@@ -95,14 +131,14 @@ Returns:
 }
 ```
 
-### Protected Route
+#### Protected Route
 
 ```
 GET /api/auth/me
 Authorization: Bearer ACCESS_TOKEN
 ```
 
-### Refresh Token
+#### Refresh Token
 
 ```
 POST /api/auth/refresh
@@ -113,7 +149,7 @@ POST /api/auth/refresh
 
 Returns new access + refresh tokens (rotation enabled).
 
-### Logout (current device)
+#### Logout (current device)
 
 ```
 POST /api/auth/logout
@@ -122,7 +158,7 @@ POST /api/auth/logout
 }
 ```
 
-### Logout from all devices
+#### Logout from all devices
 
 ```
 POST /api/auth/logout-all
@@ -134,15 +170,25 @@ Revokes all active sessions for the user.
 ## 🛡️ Security Design
 
 - Access tokens are short-lived
-- Refresh tokens are rotated
-- Logout-all revokes all sessions
-- RBAC enforced at backend level
-- Supabase used only as Identity Provider
+- Refresh tokens are rotated (Fastify + Supabase)
+- Logout-all revokes all sessions (Fastify + Supabase)
+- RBAC enforced at backend level (Fastify + Supabase)
+- Supabase used only as Identity Provider (when applicable)
 - Backend controls authorization
 
 ## ⚙️ Environment Variables
 
-Create a `.env` file:
+Create a `.env` file based on your template:
+
+### For MongoDB Templates
+
+```env
+PORT=5000
+JWT_SECRET=your_super_strong_secret
+MONGODB_URI=mongodb://localhost:27017/yourdb
+```
+
+### For Supabase Templates
 
 ```env
 PORT=5000
@@ -154,39 +200,51 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 ## 🚧 Development
 
+After generating your project:
+
 ```bash
+cd my-backend
 npm install
 npm run dev
 ```
 
-## 🧠 Why Not Use Supabase JWT Directly?
+## 🧠 Architecture Notes
 
-Supabase Auth verifies identity.
-This backend issues its own JWT to:
-
-- enforce RBAC
-- support logout-all
-- control refresh rotation
-- decouple backend from Supabase
-- scale to microservices
-
-This is industry-standard architecture.
+- Supabase Auth verifies identity (when used)
+- Backend issues its own JWT for control over authorization
+- Decoupled design allows scaling to microservices
+- Feature-based architecture for maintainability
 
 ## 🔮 Roadmap
 
-- ✅ Express + Supabase support
-- ⏳ MongoDB auth & RBAC
-- ⏳ Refresh token persistence (Supabase DB)
+- ✅ Fastify + Supabase (advanced features)
+- ✅ Express + MongoDB (basic auth)
+- ✅ Fastify + MongoDB (basic auth)
+- ⏳ Express + Supabase support
+- ⏳ Refresh token persistence (database storage)
 - ⏳ Session & device tracking
 - ⏳ Rate limiting & brute-force protection
 - ⏳ Admin session management
-- ⏳ OAuth providers
+- ⏳ OAuth providers integration
+- ⏳ Additional database support
+
+## 🤝 Contributing
+
+This project is in beta, and contributions are welcome! Please:
+
+- Report bugs via [GitHub Issues](https://github.com/ImaadDev/create-enterprise-backend/issues)
+- Suggest features or improvements
+- Submit pull requests for enhancements
 
 ## 👨‍💻 Author
 
 Imad Hussain Khan  
 Full-Stack Web Developer  
 Enterprise Backend & SaaS Architect
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) for details.
 
 ## ⭐ Support
 
@@ -196,10 +254,14 @@ If you find this useful:
 - 📦 Use it in your projects
 - 💬 Share feedback & ideas
 
+## ☕ Support the Project
+
+If you find this tool helpful, consider supporting its development:
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/imadhussainkhan)
+
 ## 🏁 Final Note
 
-This tool is designed for real-world, enterprise backends, not demos.
-
-If you understand this codebase — you understand modern backend architecture.
+This tool is designed for real-world backends. While in beta, it provides a solid foundation for building scalable applications.
 
 🚀 Happy building!
