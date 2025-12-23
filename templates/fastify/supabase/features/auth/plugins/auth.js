@@ -1,12 +1,10 @@
 
-
+import fp from "fastify-plugin";
 import jwt from "jsonwebtoken";
 
-export default async function authPlugin(fastify) {
-  // decorate request with auth payload
+export default fp(async function authPlugin(fastify) {
   fastify.decorateRequest("auth", null);
 
-  // authentication middleware
   fastify.decorate("authenticate", async (request, reply) => {
     const authHeader = request.headers.authorization;
 
@@ -17,11 +15,11 @@ export default async function authPlugin(fastify) {
     try {
       const token = authHeader.split(" ")[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      request.auth = decoded; // { id, email, role, iat, exp }
-    } catch (err) {
+      request.auth = decoded;
+    } catch {
       return reply.code(401).send({ message: "Invalid token" });
     }
   });
-}
+});
+
 
