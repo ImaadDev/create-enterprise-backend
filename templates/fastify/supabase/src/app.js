@@ -2,9 +2,14 @@ import Fastify from "fastify";
 import requestContext from "./plugins/request-content.js";
 import { registerRoutes } from "./routes.js";
 import { globalErrorHandler } from "./utils/error-handler.js";
+import { registerGenerated } from "./generated/register.js";
 
-export function buildApp() {
+
+export async function buildApp() {
   const app = Fastify({ logger: true });
+
+  // after creating app
+await registerGenerated(app);
 
   app.register(requestContext);
 
@@ -18,6 +23,8 @@ export function buildApp() {
   registerRoutes(app);
 
   app.setErrorHandler(globalErrorHandler);
+
+
 
   return app;
 }

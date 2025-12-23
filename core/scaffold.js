@@ -15,6 +15,7 @@ const DB_MAP = {
 export async function generateProject({
   framework,
   database,
+  features = [],
   targetDir,
   projectName
 }) {
@@ -35,7 +36,7 @@ export async function generateProject({
 
   await fs.ensureDir(targetDir);
 
-  // 🔒 EMPTY DIRECTORY CHECK (CRITICAL)
+  // 🔒 EMPTY DIRECTORY CHECK
   if (isCurrentDir) {
     const entries = await fs.readdir(targetDir);
     const allowed = [".git", ".gitignore", ".DS_Store"];
@@ -47,19 +48,82 @@ export async function generateProject({
       );
     }
   } else {
-    if ((await fs.pathExists(targetDir)) && (await fs.readdir(targetDir)).length) {
+    if (
+      (await fs.pathExists(targetDir)) &&
+      (await fs.readdir(targetDir)).length
+    ) {
       throw new Error(`Target folder already exists: ${projectName}`);
     }
   }
 
-  // ✅ SAFE COPY
-  await fs.copy(templateDir, targetDir);
+  /* --------------------------------------------------
+     1️⃣ COPY BASE TEMPLATE (THIS WAS MISSING)
+  -------------------------------------------------- */
+  await fs.copy(templateDir, targetDir, {
+  filter: (src) => {
+    // ❌ do NOT copy features folder
+    if (src.includes(`${path.sep}features`)) return false;
+    return true;
+  }
+});
 
-  // Rename package.json only when not using "."
+
+  /* --------------------------------------------------
+     2️⃣ FEATURE OVERLAY (MERGE INTO src/)
+  -------------------------------------------------- */
+  const srcDir = path.join(targetDir, "src");
+
+  for (const feature of features) {
+    const featureDir = path.join(templateDir, "features", feature);
+
+    if (await fs.pathExists(featureDir)) {
+      await fs.copy(featureDir, srcDir, { overwrite: true });
+    }
+  }
+
+  /* --------------------------------------------------
+     3️⃣ AUTO-GENERATED FEATURE REGISTRATION
+  -------------------------------------------------- */
+  const generatedDir = path.join(srcDir, "generated");
+  await fs.ensureDir(generatedDir);
+
+  const registerFile = path.join(generatedDir, "register.js");
+  await fs.writeFile(registerFile, buildRegisterFile(features), "utf8");
+
+  /* --------------------------------------------------
+     4️⃣ RENAME package.json (IF NEEDED)
+  -------------------------------------------------- */
   const pkgPath = path.join(targetDir, "package.json");
   if (!isCurrentDir && (await fs.pathExists(pkgPath))) {
     const pkg = await fs.readJson(pkgPath);
     pkg.name = projectName;
     await fs.writeJson(pkgPath, pkg, { spaces: 2 });
   }
+}
+
+/* --------------------------------------------------
+   INTERNAL HELPER (DO NOT EXPORT)
+-------------------------------------------------- */
+function buildRegisterFile(features) {
+  let content = `// AUTO-GENERATED - DO NOT EDIT
+export async function registerGenerated(app) {
+`;
+
+  if (features.includes("auth")) {
+    content += `
+  const authPlugin = (await import("../plugins/auth.js")).default;
+  const authRoutes = (await import("../modules/auth/auth.routes.js")).default;
+
+  await app.register(authPlugin);
+  await app.register(authRoutes, { prefix: "/api/auth" });
+`;
+  }
+
+  // RBAC is middleware-only → no registration needed
+
+  content += `
+}
+`;
+
+  return content;
 }

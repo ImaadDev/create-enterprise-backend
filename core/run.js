@@ -37,6 +37,15 @@ export async function run() {
         ]
       },
       {
+  type: "multiselect",
+  name: "features",
+  message: "Select enterprise features",
+  choices: [
+    { title: "Authentication (JWT + Supabase)", value: "auth" },
+    { title: "Role Based Access Control (RBAC)", value: "rbac" }
+  ]
+},
+      {
         type: "toggle",
         name: "install",
         message: "Install dependencies now?",
@@ -65,9 +74,12 @@ export async function run() {
   await generateProject({
     framework: answers.framework,
     database: answers.database,
+    features: answers.features || [],
     targetDir,
     projectName
   });
+
+
 
   // 🔒 SAFETY CHECK
   const pkgPath = path.join(targetDir, "package.json");
