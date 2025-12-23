@@ -42,7 +42,9 @@ export async function run() {
   message: "Select enterprise features",
   choices: [
     { title: "Authentication (JWT + Supabase)", value: "auth" },
+    { title: "Refresh Tokens + Logout", value: "refresh-token" },
     { title: "Role Based Access Control (RBAC)", value: "rbac" }
+
   ]
 },
       {

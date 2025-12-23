@@ -1,12 +1,9 @@
 import jwt from "jsonwebtoken";
 import { supabasePublic } from "../../config/supabase.js";
 
-
-console.log("JWT_SECRET:", !!process.env.JWT_SECRET);
-
-
 /**
- * Login user using Supabase Auth
+ * Login user (ACCESS TOKEN ONLY)
+ * Refresh-token feature may extend this later
  */
 export async function loginUser({ email, password }) {
   const { data, error } = await supabasePublic.auth.signInWithPassword({
@@ -19,11 +16,9 @@ export async function loginUser({ email, password }) {
   }
 
   const user = data.user;
-
   const role = user.user_metadata?.role || "user";
 
-  // Issue backend JWT
-  const token = jwt.sign(
+  const accessToken = jwt.sign(
     {
       id: user.id,
       email: user.email,
@@ -34,7 +29,7 @@ export async function loginUser({ email, password }) {
   );
 
   return {
-    token,
+    accessToken,
     user: {
       id: user.id,
       email: user.email,

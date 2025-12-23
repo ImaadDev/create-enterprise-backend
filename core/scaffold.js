@@ -119,11 +119,19 @@ export async function registerGenerated(app) {
 `;
   }
 
-  // RBAC is middleware-only → no registration needed
+  if (features.includes("refresh-token")) {
+    content += `
+  const refreshStore = (await import("../plugins/refresh.store.js")).default;
+  const refreshRoutes = (await import("../modules/auth/refresh.routes.js")).default;
+
+  await app.register(refreshStore);
+  await app.register(refreshRoutes, { prefix: "/api/auth" });
+`;
+  }
 
   content += `
 }
 `;
-
   return content;
 }
+
